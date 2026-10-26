@@ -1,104 +1,41 @@
 # 穿搭日记
 
-记录每天穿什么的简单工具。拍照、打标签，之后可以按季节、颜色、风格翻找。数据存在自己的数据库里，不经过任何第三方。
+记录每天穿什么的工具。拍照、打标签，之后可以按季节、颜色、风格翻着找。
 
-这份说明写给没有折腾过代码的人，跟着做大概半小时能跑起来。卡在哪一步，把报错截图发给推荐人。
+数据存在自己的数据库里，照片存在自己电脑上，不经过任何第三方服务。
 
-## 需要准备
+## 功能
 
-- 一台电脑，Windows 或 Mac 都可以。需要一直开着机，关机期间网页打不开（数据不会丢，重开就行）。家里有云服务器更好。
-- Node.js（运行环境）
-- PostgreSQL（数据库）
+- **每日推荐**：按当前季节从衣橱里挑一套穿搭，不知道穿什么时点一下
+- **拍照记录**：支持一次选多张，批量上传
+- **标签体系**：季节 + 颜色 + 风格，也可以自己加标签
+- **筛选搜索**：按季节过滤，按风格/标签关键字搜索
+- **手机适配**：页面按手机设计，浏览器里可以「添加到主屏幕」当 App 用
 
-## 1. 安装 Node.js
+## 界面
 
-去 https://nodejs.org/zh-cn 下载 LTS 版本，双击安装，全部默认。
+| 每日推荐 | 我的衣橱 |
+|---|---|
+| ![每日推荐](docs/screenshots/1-home.png) | ![我的衣橱](docs/screenshots/2-closet.png) |
 
-装完打开命令行验证一下：Windows 按 Win+R 输入 cmd 回车，Mac 打开「终端」，输入：
+| 季节筛选 | 添加穿搭 |
+|---|---|
+| ![季节筛选](docs/screenshots/3-filter.png) | ![添加穿搭](docs/screenshots/4-add.png) |
 
-```
-node -v
-```
+## 运行
 
-显示出版本号（比如 v22.x.x）就可以了。
+需要 Node.js 和 PostgreSQL，详细步骤见 [部署说明](部署说明.md)。
 
-## 2. 安装 PostgreSQL
-
-去 https://www.postgresql.org/download/ 下载对应系统的安装包，一路默认装完。
-
-安装过程中会让你设置一个数据库密码，自己记好。端口保持默认 5432 不动。
-
-## 3. 建数据库
-
-打开命令行，执行：
-
-```
-psql -U postgres -h localhost
-```
-
-提示输入密码，就是上一步设置的那个。进去之后（提示符变成 `postgres=#`）执行：
-
-```sql
-CREATE DATABASE outfit_diary;
-\q
-```
-
-数据表不用手动建，程序第一次启动时会自己创建。
-
-## 4. 配置
-
-在程序文件夹里找到 `.env.example`，复制一份，改名为 `.env`，用记事本打开，把密码那一行改成你的数据库密码：
-
-```
-DB_HOST=localhost
-DB_PORT=5432
-DB_USER=postgres
-DB_PASSWORD=你的密码
-DB_NAME=outfit_diary
-PORT=3000
-```
-
-保存关闭。
-
-## 5. 启动
-
-在程序文件夹里打开命令行（Windows 可以在文件夹地址栏直接输入 cmd 回车；Mac 在文件夹上右键 → 服务 → 新建位于文件夹位置的终端窗口），执行：
-
-```
+```bash
 npm install
+cp .env.example .env   # 填入数据库密码
 npm start
 ```
 
-`npm install` 只有第一次需要，以后直接 `npm start`。
+然后浏览器打开 `http://localhost:3000/outfit.html`。
 
-看到「穿搭日记服务已启动」之后，浏览器打开：
+## 技术构成
 
-```
-http://localhost:3000/outfit.html
-```
+前端是单个 HTML 页面，没有构建步骤；后端是 Express + PostgreSQL；照片以文件形式存在本地 `uploads/` 目录，数据库里只存路径。
 
-## 手机访问
-
-手机和电脑连同一个 Wi-Fi，在手机浏览器访问：
-
-```
-http://电脑的IP:3000/outfit.html
-```
-
-电脑 IP 怎么查：Windows 命令行输入 `ipconfig`，找 IPv4 地址；Mac 在 设置 → Wi-Fi → 详细信息 里看。
-
-iPhone 可以把这个网页「添加到主屏幕」，用起来和 App 差不多。
-
-## 常见问题
-
-**启动时报数据库连接失败**
-检查 .env 里的密码对不对，PostgreSQL 服务有没有在跑。Windows 在服务管理器里找 postgresql 开头的服务；Mac 用 `brew services start postgresql` 启动。
-
-**提示端口 3000 被占用**
-改 .env 里的 PORT，比如改成 3005，访问地址相应改成 `http://localhost:3005/outfit.html`。
-
-**数据存在哪里，怎么备份**
-照片文件在程序文件夹的 `uploads/outfits/` 里，文字数据在 PostgreSQL 的 `outfit_diary` 库里。备份 = 复制整个程序文件夹 + 导出数据库。
-
-**想在外面也能访问 / 开机自动启动**
-这两项需要额外配置（内网穿透或 Cloudflare Tunnel、PM2），找推荐人要进阶说明。
+配置通过 `.env` 文件管理，敏感信息不会进代码库。
