@@ -1,0 +1,16 @@
+{
+  "name": "outfit-diary",
+  "version": "1.0.0",
+  "description": "穿搭日记 - 个人穿搭记录小程序（拍照 + 标签 + 季节/颜色/风格筛选）",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "license": "MIT",
+  "type": "commonjs",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "pg": "^8.21.0"
+  }
+}

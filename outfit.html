@@ -1,0 +1,1335 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#F8F5F0">
+  <title>穿搭日记</title>
+  <style>
+    :root {
+      --bg: #F8F5F0;
+      --card-bg: #FFFFFF;
+      --text: #2C2C2C;
+      --text-secondary: #9A8E82;
+      --primary: #B8956A;
+      --primary-light: rgba(184, 149, 106, 0.12);
+      --accent: #D4C4B0;
+      --border: #EAE3DA;
+      --shadow-sm: 0 2px 12px rgba(139, 115, 85, 0.06);
+      --shadow-md: 0 4px 20px rgba(139, 115, 85, 0.08);
+      --radius-xl: 28px;
+      --radius-lg: 20px;
+      --radius-md: 14px;
+      --radius-sm: 10px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    @font-face {
+      font-family: 'Comic';
+      src: local('PingFang SC'), local('Microsoft YaHei');
+      font-weight: bold;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      font-weight: 400;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding-bottom: 96px;
+      letter-spacing: 0.2px;
+    }
+
+    .page { display: none; max-width: 440px; margin: 0 auto; }
+    .page.active { display: block; }
+
+    /* 顶部导航 */
+    .top-nav {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--bg);
+      padding: calc(20px + env(safe-area-inset-top)) 20px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .search-input {
+      flex: 1;
+      padding: 10px 16px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-md);
+      background: var(--card-bg);
+      font-size: 14px;
+      color: var(--text);
+      outline: none;
+    }
+    .search-input:focus {
+      border-color: var(--primary);
+    }
+    .search-input::placeholder {
+      color: var(--text-secondary);
+    }
+    .top-nav .logo {
+      font-family: 'PingFang SC', sans-serif;
+      font-size: 22px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      color: var(--text);
+    }
+
+    /* 分类轮播 banner */
+    .category-banner {
+      padding: 0 20px 16px;
+    }
+    .banner-card {
+      width: 100%;
+      height: 120px;
+      background: linear-gradient(135deg, #E8DDD0 0%, #D4C4B0 100%);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      color: #5C4A3A;
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+    .banner-card .title {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .banner-card .subtitle {
+      font-size: 13px;
+      opacity: 0.9;
+    }
+    .banner-card::after {
+      content: '';
+      position: absolute;
+      right: -30px;
+      top: -30px;
+      width: 120px;
+      height: 120px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 50%;
+    }
+
+    /* 分类栏 */
+    .category-section {
+      padding: 0 20px 20px;
+    }
+    .category-scroll {
+      display: flex;
+      gap: 16px;
+      overflow-x: auto;
+      width: max-content;
+    }
+    .season-tags {
+      display: flex;
+      gap: 8px;
+      padding: 0 20px 16px;
+      flex-wrap: wrap;
+    }
+    .season-tag {
+      padding: 6px 14px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text-secondary);
+      font-size: 13px;
+      font-weight: 400;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .season-tag.active {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+
+    /* 穿搭网格 */
+    .outfit-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      padding: 0 20px 24px;
+    }
+    .outfit-card {
+      background: var(--card-bg);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      cursor: pointer;
+      position: relative;
+      border: 1px solid var(--border);
+    }
+    .outfit-card:active { transform: scale(0.98); }
+    .outfit-card .photo-container {
+      width: 100%;
+      aspect-ratio: 3/4;
+      overflow: hidden;
+      border-radius: var(--radius-md) var(--radius-md) 0 0;
+    }
+    .outfit-card img { width: 100%; height: 100%; object-fit: cover; }
+    .outfit-card .delete-btn {
+      position: absolute;
+      top: 10px; right: 10px;
+      width: 24px; height: 24px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.9);
+      border: none;
+      font-size: 14px;
+      font-weight: 300;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--shadow-sm);
+      color: #9A8E82;
+      z-index: 10;
+    }
+    .outfit-card .info { padding: 12px; }
+    .outfit-card .tags { 
+      display: flex; 
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-bottom: 8px;
+      min-height: 18px;
+    }
+    .outfit-card .tag {
+      font-size: 10px;
+      padding: 3px 8px;
+      border-radius: 8px;
+      background: var(--bg);
+      color: var(--text-secondary);
+      font-weight: 500;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .outfit-card .meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .outfit-card .meta .date {
+      font-size: 11px;
+      color: var(--text-secondary);
+    }
+
+    /* 推荐页面 */
+    .recommend-container { padding: 0 20px 24px; }
+    .recommend-card {
+      background: var(--card-bg);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      margin-bottom: 16px;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border);
+    }
+    .recommend-card .img-container {
+      width: 100%;
+      padding: 12px 16px 8px;
+    }
+    .recommend-card img {
+      width: 100%;
+      border-radius: var(--radius-lg);
+      max-height: 320px;
+      object-fit: cover;
+    }
+    .recommend-card .label {
+      padding: 0 16px 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .recommend-card .label .tag {
+      background: var(--primary-light);
+      color: var(--primary);
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .recommend-card .info { padding: 0 16px 12px; }
+    .recommend-card .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .recommend-card .tag {
+      font-size: 12px;
+      padding: 4px 10px;
+      border-radius: 8px;
+      background: var(--bg);
+      color: var(--text-secondary);
+      font-weight: 400;
+    }
+    .refresh-btn {
+      width: 100%;
+      padding: 16px;
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-md);
+      font-size: 15px;
+      font-weight: 500;
+      cursor: pointer;
+      margin-top: 8px;
+      box-shadow: var(--shadow-sm);
+      letter-spacing: 0.5px;
+    }
+    .refresh-btn:active { transform: scale(0.98); }
+
+    /* 底部导航 */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+      padding: 12px 0;
+      padding-bottom: max(12px, env(safe-area-inset-bottom));
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      justify-items: center;
+      align-items: center;
+      max-width: 440px;
+      margin: 0 auto;
+      z-index: 200;
+      box-shadow: 0 -2px 16px rgba(139, 115, 85, 0.06);
+      border-top: 1px solid var(--border);
+    }
+    .nav-btn {
+      padding: 8px 16px;
+      border-radius: var(--radius-md);
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      font-size: 13px;
+      font-weight: 400;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      letter-spacing: 0.5px;
+    }
+    .nav-btn .text {
+      font-size: 13px;
+    }
+    .nav-btn.active {
+      background: transparent;
+      color: var(--text);
+      font-weight: 600;
+    }
+    .nav-btn.add-btn {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: #fff;
+      font-size: 24px;
+      font-weight: 300;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: row;
+      line-height: 1;
+      box-shadow: 0 2px 12px rgba(184, 149, 106, 0.3);
+    }
+
+    /* 上传弹窗 */
+    #uploadModal {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(44, 44, 44, 0.3);
+      z-index: 1000;
+      display: none;
+      align-items: flex-end;
+    }
+    #uploadModal .modal-content {
+      background: var(--card-bg);
+      border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+      padding: calc(24px + env(safe-area-inset-top)) 20px 24px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    #uploadModal .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+    #uploadModal .modal-header h2 {
+      font-size: 18px;
+      font-weight: 700;
+    }
+    #uploadModal .back-btn {
+      background: var(--bg);
+      border: none;
+      font-size: 18px;
+      font-weight: 400;
+      cursor: pointer;
+      padding: 0;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text);
+    }
+
+    /* 上传表单 */
+    .form-section { }
+    .form-group { margin-bottom: 20px; }
+    .form-group label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 10px;
+      padding-left: 2px;
+    }
+    .form-group input, .form-group select {
+      width: 100%;
+      padding: 14px 16px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-md);
+      font-size: 15px;
+      font-weight: 400;
+      background: var(--bg);
+      color: var(--text);
+      -webkit-appearance: none;
+      appearance: none;
+      outline: none;
+    }
+    .form-group input:focus, .form-group select:focus {
+      border-color: var(--primary);
+    }
+    .tags-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 6px;
+    }
+    .tag-btn {
+      padding: 8px 16px;
+      border: 1.5px solid var(--border);
+      border-radius: 20px;
+      background: transparent;
+      color: var(--text-secondary);
+      font-size: 13px;
+      font-weight: 400;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .tag-btn.active {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+    .photo-preview {
+      width: 100%;
+      aspect-ratio: 1/1;
+      max-height: 350px;
+      background: var(--bg);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      border: 2px dashed var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 12px;
+      cursor: pointer;
+      position: relative;
+    }
+    .photo-preview.has-image { border: none; }
+    .photo-preview img { width: 100%; height: 100%; object-fit: cover; }
+    .photo-preview .placeholder { color: var(--text-secondary); font-size: 14px; text-align: center; line-height: 1.6; }
+
+    /* 批量缩略图列表 */
+    .batch-thumb-list {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      padding: 4px 0 12px;
+      margin-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .batch-thumb {
+      width: 70px;
+      height: 90px;
+      border-radius: 10px;
+      overflow: hidden;
+      flex-shrink: 0;
+      cursor: pointer;
+      border: 3px solid transparent;
+      position: relative;
+      opacity: 0.6;
+      transition: all 0.2s;
+    }
+    .batch-thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .batch-thumb.active {
+      border-color: var(--primary);
+      opacity: 1;
+      transform: scale(1.05);
+    }
+    .batch-thumb.saved::after {
+      content: '✓';
+      position: absolute;
+      top: 4px; right: 4px;
+      width: 20px; height: 20px;
+      background: #4CAF50;
+      color: #fff;
+      border-radius: 50%;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .batch-thumb .thumb-index {
+      position: absolute;
+      bottom: 4px; left: 4px;
+      background: rgba(44, 44, 44, 0.6);
+      color: #fff;
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 8px;
+    }
+
+    .submit-btn {
+      width: 100%;
+      padding: 16px;
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-md);
+      font-size: 15px;
+      font-weight: 500;
+      cursor: pointer;
+      margin-top: 8px;
+      letter-spacing: 0.5px;
+    }
+    .submit-btn:active { transform: scale(0.98); }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(44, 44, 44, 0.85);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      color: #fff;
+      padding: 12px 28px;
+      border-radius: var(--radius-md);
+      z-index: 1001;
+      display: none;
+      font-size: 14px;
+      font-weight: 400;
+    }
+    .toast.show { display: block; opacity: 1; }
+
+    /* 空状态 */
+    .empty-state {
+      text-align: center;
+      padding: 100px 20px;
+      color: var(--text-secondary);
+    }
+    .empty-state .icon { font-size: 80px; margin-bottom: 20px; opacity: 0.4; }
+    .empty-state p { font-size: 14px; line-height: 1.6; }
+  </style>
+</head>
+<body>
+  <input type="file" id="fileInput" accept="image/*" multiple style="display:none">
+
+  <!-- 穿搭库页面 -->
+  <div class="page" id="page-library">
+    <!-- 顶部导航 -->
+    <div class="top-nav">
+      <div class="logo">OUTFIT</div>
+      <input type="text" class="search-input" placeholder="搜索风格/标签..." id="searchInput" oninput="handleSearch()">
+    </div>
+    <!-- 季节小标签 -->
+    <div class="season-tags">
+      <button class="season-tag active" onclick="filterByCategory('all')">全部</button>
+      <button class="season-tag" onclick="filterByCategory('春')">春</button>
+      <button class="season-tag" onclick="filterByCategory('夏')">夏</button>
+      <button class="season-tag" onclick="filterByCategory('秋')">秋</button>
+      <button class="season-tag" onclick="filterByCategory('冬')">冬</button>
+    </div>
+    <div class="outfit-grid" id="outfitGrid"></div>
+  </div>
+
+  <!-- 今日推荐页面 -->
+  <div class="page active" id="page-recommend">
+    <!-- 顶部导航 -->
+    <div class="top-nav">
+      <div class="logo">OUTFIT</div>
+    </div>
+    <!-- banner -->
+    <div class="category-banner">
+      <div class="banner-card">
+        <div class="title">今日穿搭推荐</div>
+        <div class="subtitle">根据当前季节精选</div>
+      </div>
+    </div>
+    <div class="recommend-container" id="recommendContainer"></div>
+  </div>
+
+  <nav class="bottom-nav">
+    <button class="nav-btn active" onclick="switchTab('recommend')">
+      <span class="text">今日推荐</span>
+    </button>
+    <button class="nav-btn add-btn" onclick="openUploadModal()">
+      <span class="text">+</span>
+    </button>
+    <button class="nav-btn" onclick="switchTab('library')">
+      <span class="text">我的衣橱</span>
+    </button>
+  </nav>
+
+  <!-- 上传弹窗 -->
+  <div id="uploadModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button class="back-btn" onclick="closeUploadModal()">←</button>
+        <h2 id="modalTitle">添加今日穿搭</h2>
+        <div style="width:32px;"></div>
+      </div>
+      
+      <!-- 步骤1：选择图片 -->
+      <div id="stepSelect" class="form-section">
+        <div class="form-group">
+          <label>穿搭照片 <span style="font-size: 12px; color: var(--text-secondary); font-weight: normal;">支持多选、拖拽</span></label>
+          <div class="photo-preview" id="uploadPreview" onclick="choosePhoto()">
+            <span class="placeholder">点击选择照片<br>或拖拽图片到此处<br>支持一次选多张批量上传</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 步骤2：批量编辑 -->
+      <div id="stepEdit" class="form-section" style="display:none;">
+        <div class="batch-thumb-list" id="batchThumbList"></div>
+        
+        <div id="singleEditArea">
+          <div class="form-group">
+            <label>当前编辑 <span id="editIndex">1/1</span></label>
+            <div class="photo-preview has-image" id="editPreview" style="margin-bottom:12px;">
+              <img id="editPreviewImg" src="" style="width:100%;height:100%;object-fit:cover;">
+            </div>
+            <div class="color-bar" id="colorBar" style="display:flex;gap:8px;align-items:center;margin-bottom:12px;">
+              <div class="color-dot" id="colorDot" style="width:24px;height:24px;border-radius:50%;border:2px solid #fff;box-shadow:0 2px 8px rgba(139, 115, 85, 0.15);"></div>
+              <span id="colorName" style="font-size:14px;font-weight:500;"></span>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label>季节</label>
+            <select id="seasonSelect">
+              <option value="春">春</option>
+              <option value="夏">夏</option>
+              <option value="秋">秋</option>
+              <option value="冬">冬</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label>风格（可多选）</label>
+            <div class="tags-container" id="styleTags">
+              <button class="tag-btn" data-tag="休闲">休闲</button>
+              <button class="tag-btn" data-tag="运动">运动</button>
+              <button class="tag-btn" data-tag="温柔">温柔</button>
+              <button class="tag-btn" data-tag="可爱">可爱</button>
+              <button class="tag-btn" data-tag="甜美">甜美</button>
+              <button class="tag-btn" data-tag="酷飒">酷飒</button>
+              <button class="tag-btn" data-tag="复古">复古</button>
+              <button class="tag-btn" data-tag="日系">日系</button>
+              <button class="tag-btn" data-tag="韩系">韩系</button>
+              <button class="tag-btn" data-tag="极简">极简</button>
+              <button class="tag-btn" data-tag="街头">街头</button>
+              <button class="tag-btn" data-tag="法式">法式</button>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label>场景（可多选）</label>
+            <div class="tags-container" id="sceneTags">
+              <button class="tag-btn" data-tag="通勤">通勤</button>
+              <button class="tag-btn" data-tag="聚会">聚会</button>
+              <button class="tag-btn" data-tag="旅游">旅游</button>
+              <button class="tag-btn" data-tag="徒步">徒步</button>
+              <button class="tag-btn" data-tag="约会">约会</button>
+              <button class="tag-btn" data-tag="居家">居家</button>
+              <button class="tag-btn" data-tag="逛街">逛街</button>
+              <button class="tag-btn" data-tag="运动">运动</button>
+            </div>
+          </div>
+        </div>
+        
+        <div style="display:flex;gap:10px;margin-top:16px;">
+          <button class="submit-btn" style="flex:1;background:var(--text-secondary);" onclick="saveCurrentAndNext()">保存并下一张</button>
+          <button class="submit-btn" style="flex:1;" onclick="saveAllRemaining()">一键保存全部</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = '/api';
+    let currentPhoto = null;
+    let allOutfits = [];
+    let currentCategory = 'all';
+    let currentEditingId = null;
+    let searchKeyword = '';
+
+    function handleSearch() {
+      searchKeyword = document.getElementById('searchInput').value.trim().toLowerCase();
+      renderOutfits();
+    }
+
+    function showToast(msg) {
+      // toast 已禁用
+    }
+
+    // 标签点击切换选中状态
+    document.addEventListener('click', function(e) {
+      if (e.target.classList.contains('tag-btn')) {
+        e.target.classList.toggle('active');
+      }
+    });
+
+    function switchTab(tab) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('page-' + tab).classList.add('active');
+      // 选中对应导航按钮
+      document.querySelector(`.nav-btn[onclick*=\"'${tab}'\"]`).classList.add('active');
+      
+      if (tab === 'library') {
+        loadOutfits().then(renderOutfits);
+      }
+      if (tab === 'recommend') {
+        loadRecommendations();
+      }
+    }
+
+    function filterByCategory(category) {
+      currentCategory = category;
+      document.querySelectorAll('.season-tag').forEach(btn => btn.classList.remove('active'));
+      // 选中对应分类按钮
+      document.querySelector(`.season-tag[onclick*=\"'${category}'\"]`).classList.add('active');
+      renderOutfits();
+    }
+
+    // ========== 批量上传系统 ==========
+    let uploadQueue = [];      // 待上传队列
+    let currentEditIndex = 0;  // 当前编辑的索引
+    let isBatchMode = false;   // 是否批量模式
+
+    function choosePhoto() {
+      document.getElementById('fileInput').click();
+    }
+
+    document.getElementById('fileInput').onchange = async (e) => {
+      const files = Array.from(e.target.files).filter(f => f.type.startsWith('image/'));
+      if (files.length === 0) return;
+      await handleFiles(files);
+    };
+
+    // 拖拽上传
+    document.addEventListener('DOMContentLoaded', () => {
+      const zone = document.getElementById('uploadPreview');
+      if (!zone) return;
+      zone.ondragover = (e) => { e.preventDefault(); zone.style.borderColor = 'var(--primary)'; };
+      zone.ondragleave = () => { zone.style.borderColor = '#E8D8CE'; };
+      zone.ondrop = async (e) => {
+        e.preventDefault();
+        zone.style.borderColor = '#E8D8CE';
+        const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
+        if (files.length) await handleFiles(files);
+      };
+    });
+
+    // 图片压缩：最大宽800px，JPEG质量0.8
+    function compressImage(base64, maxWidth = 800, quality = 0.8) {
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => {
+          let w = img.width, h = img.height;
+          if (w > maxWidth) { h = Math.round(h * maxWidth / w); w = maxWidth; }
+          const canvas = document.createElement('canvas');
+          canvas.width = w; canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, w, h);
+          resolve(canvas.toDataURL('image/jpeg', quality));
+        };
+        img.src = base64;
+      });
+    }
+
+    async function handleFiles(files) {
+      uploadQueue = [];
+      for (const file of files) {
+        const rawBase64 = await new Promise(r => { const rd = new FileReader(); rd.onload = e => r(e.target.result); rd.readAsDataURL(file); });
+        showToast(`压缩中 ${uploadQueue.length + 1}/${files.length}...`);
+        const compressed = await compressImage(rawBase64);
+        uploadQueue.push({ photo: compressed, saved: false, color: '', season: getCurrentSeason(), styleTags: [], sceneTags: [] });
+      }
+      isBatchMode = uploadQueue.length > 1;
+      currentEditIndex = 0;
+      enterEditMode();
+    }
+
+    function enterEditMode() {
+      document.getElementById('stepSelect').style.display = 'none';
+      document.getElementById('stepEdit').style.display = 'block';
+      document.getElementById('modalTitle').textContent = isBatchMode ? `批量上传 (${uploadQueue.length}张)` : '添加今日穿搭';
+      renderThumbList();
+      switchEditItem(0);
+      openUploadModal();
+    }
+
+    function renderThumbList() {
+      const list = document.getElementById('batchThumbList');
+      list.innerHTML = uploadQueue.map((item, i) => `
+        <div class="batch-thumb ${i === currentEditIndex ? 'active' : ''} ${item.saved ? 'saved' : ''}" onclick="switchEditItem(${i})">
+          <img src="${item.photo}">
+          <span class="thumb-index">${i + 1}</span>
+        </div>
+      `).join('');
+    }
+
+    function switchEditItem(index) {
+      if (index < 0 || index >= uploadQueue.length) return;
+      currentEditIndex = index;
+      const item = uploadQueue[index];
+
+      // 更新缩略图高亮
+      document.querySelectorAll('.batch-thumb').forEach((el, i) => {
+        el.classList.toggle('active', i === index);
+      });
+
+      // 更新大图
+      document.getElementById('editPreviewImg').src = item.photo;
+      document.getElementById('editIndex').textContent = `${index + 1}/${uploadQueue.length}`;
+
+      // 自动识别颜色（如果还没识别过）
+      if (!item.color) {
+        detectColor(item.photo, item);
+      } else {
+        showDetectedColor(item);
+      }
+
+      // 填充季节
+      document.getElementById('seasonSelect').value = item.season;
+
+      // 填充标签
+      document.querySelectorAll('#styleTags .tag-btn').forEach(btn => {
+        btn.classList.toggle('active', item.styleTags.includes(btn.dataset.tag));
+      });
+      document.querySelectorAll('#sceneTags .tag-btn').forEach(btn => {
+        btn.classList.toggle('active', item.sceneTags.includes(btn.dataset.tag));
+      });
+    }
+
+    // 颜色识别
+    function detectColor(imgSrc, item) {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = 60; canvas.height = 60;
+        // 取中间区域
+        ctx.drawImage(img, img.width * 0.2, img.height * 0.1, img.width * 0.6, img.height * 0.8, 0, 0, 60, 60);
+        const data = ctx.getImageData(0, 0, 60, 60).data;
+        let r = 0, g = 0, b = 0, count = 0;
+        for (let i = 0; i < data.length; i += 16) {
+          const br = (data[i] + data[i+1] + data[i+2]) / 3;
+          if (br > 20 && br < 245) { r += data[i]; g += data[i+1]; b += data[i+2]; count++; }
+        }
+        if (count > 0) { r = Math.round(r/count); g = Math.round(g/count); b = Math.round(b/count); }
+        item.color = rgbToColorName(r, g, b);
+        item.rgb = {r, g, b};
+        showDetectedColor(item);
+        // 自动推荐标签
+        autoRecommendTags(item);
+      };
+      img.src = imgSrc;
+    }
+
+    function showDetectedColor(item) {
+      const dot = document.getElementById('colorDot');
+      const name = document.getElementById('colorName');
+      if (item.rgb) {
+        dot.style.background = `rgb(${item.rgb.r},${item.rgb.g},${item.rgb.b})`;
+        dot.style.display = 'block';
+      } else {
+        dot.style.display = 'none';
+      }
+      name.textContent = item.color || '识别中...';
+    }
+
+    function rgbToColorName(r, g, b) {
+      const max = Math.max(r, g, b), min = Math.min(r, g, b);
+      const sat = max > 0 ? (max - min) / max : 0;
+      if (sat < 0.15) {
+        if (max > 210) return '白色';
+        if (max < 60) return '黑色';
+        return '灰色';
+      }
+      const hue = getHue(r, g, b);
+      if (hue < 15 || hue >= 345) return '红色';
+      if (hue < 35) return '橙色';
+      if (hue < 55) return '黄色';
+      if (hue < 85) return '黄绿色';
+      if (hue < 150) return '绿色';
+      if (hue < 190) return '青色';
+      if (hue < 240) return '蓝色';
+      if (hue < 280) return '紫色';
+      if (hue < 320) return '粉色';
+      return '玫红色';
+    }
+
+    function getHue(r, g, b) {
+      r/=255; g/=255; b/=255;
+      const max = Math.max(r,g,b), min = Math.min(r,g,b), d = max - min;
+      let h = 0;
+      if (d !== 0) {
+        switch(max) {
+          case r: h = (g-b)/d + (g<b?6:0); break;
+          case g: h = (b-r)/d + 2; break;
+          case b: h = (r-g)/d + 4; break;
+        }
+        h *= 60;
+      }
+      return h;
+    }
+
+    function autoRecommendTags(item) {
+      const color = item.color;
+      const toAdd = [];
+      // 根据颜色推荐风格
+      if (['黑色','白色','灰色'].includes(color)) toAdd.push('极简');
+      if (['粉色','米色','卡其色'].includes(color)) toAdd.push('温柔');
+      if (['红色','橙色','黄色'].includes(color)) toAdd.push('甜美');
+      if (['黑色','紫色','蓝色'].includes(color)) toAdd.push('酷飒');
+      if (['棕色','卡其色','米色'].includes(color)) toAdd.push('复古');
+      if (['白色','蓝色','粉色'].includes(color)) toAdd.push('韩系');
+      // 根据风格推荐场景
+      if (toAdd.includes('极简') || toAdd.includes('温柔')) toAdd.push('通勤');
+      if (toAdd.includes('甜美') || toAdd.includes('温柔')) toAdd.push('约会');
+      // 直接设置推荐的标签（不合并已有，以当前编辑为准）
+      item.styleTags = [...new Set(toAdd.filter(t => 
+        ['休闲','运动','温柔','可爱','甜美','酷飒','复古','日系','韩系','极简','街头','法式'].includes(t)
+      ))];
+      item.sceneTags = [...new Set(toAdd.filter(t => 
+        ['通勤','聚会','旅游','徒步','约会','居家','逛街','运动'].includes(t)
+      ))];
+      // 刷新显示
+      document.querySelectorAll('#styleTags .tag-btn').forEach(btn => {
+        btn.classList.toggle('active', item.styleTags.includes(btn.dataset.tag));
+      });
+      document.querySelectorAll('#sceneTags .tag-btn').forEach(btn => {
+        btn.classList.toggle('active', item.sceneTags.includes(btn.dataset.tag));
+      });
+    }
+
+    // 保存当前并切换到下一张
+    async function saveCurrentAndNext() {
+      const item = uploadQueue[currentEditIndex];
+      await syncFormToItem(item);
+      const ok = await doSaveItem(item);
+      if (!ok) return;
+      item.saved = true;
+      renderThumbList();
+
+      // 找下一张未保存的
+      let next = -1;
+      for (let i = currentEditIndex + 1; i < uploadQueue.length; i++) {
+        if (!uploadQueue[i].saved) { next = i; break; }
+      }
+      if (next === -1) {
+        // 往前找
+        for (let i = 0; i < currentEditIndex; i++) {
+          if (!uploadQueue[i].saved) { next = i; break; }
+        }
+      }
+
+      if (next !== -1) {
+        switchEditItem(next);
+      } else {
+        finishBatchUpload();
+      }
+    }
+
+    // 一键保存全部（用当前表单设置应用到所有未保存的）
+    async function saveAllRemaining() {
+      // 先同步当前表单到当前项
+      await syncFormToItem(uploadQueue[currentEditIndex]);
+      const template = uploadQueue[currentEditIndex];
+
+      let success = 0;
+      for (let i = 0; i < uploadQueue.length; i++) {
+        const item = uploadQueue[i];
+        if (item.saved) continue;
+        // 如果没有单独设置过，使用模板的标签；保留自己的颜色
+        if (item.styleTags.length === 0) item.styleTags = [...template.styleTags];
+        if (item.sceneTags.length === 0) item.sceneTags = [...template.sceneTags];
+        if (!item.color) { item.color = template.color; item.rgb = template.rgb; }
+        item.season = template.season;
+
+        showToast(`正在上传 ${i+1}/${uploadQueue.length}...`);
+        const ok = await doSaveItem(item);
+        if (ok) {
+          item.saved = true;
+          success++;
+        }
+      }
+      renderThumbList();
+      showToast(`✅ 成功上传 ${success}/${uploadQueue.length} 套穿搭`);
+      if (success === uploadQueue.length) {
+        setTimeout(finishBatchUpload, 800);
+      }
+    }
+
+    async function syncFormToItem(item) {
+      item.season = document.getElementById('seasonSelect').value;
+      item.color = document.getElementById('colorName').textContent;
+      item.styleTags = Array.from(document.querySelectorAll('#styleTags .tag-btn.active')).map(b => b.dataset.tag);
+      item.sceneTags = Array.from(document.querySelectorAll('#sceneTags .tag-btn.active')).map(b => b.dataset.tag);
+    }
+
+    async function doSaveItem(item) {
+      const allTags = [...new Set([...item.styleTags, ...item.sceneTags])];
+      if (allTags.length === 0) { showToast('请至少选一个标签'); return false; }
+      try {
+        const isEdit = !!currentEditingId;
+        const url = isEdit ? `${API_BASE}/outfits/${currentEditingId}` : `${API_BASE}/outfits`;
+        const res = await fetch(url, {
+          method: isEdit ? 'PUT' : 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            photo: item.photo,
+            tags: allTags,
+            season: item.season,
+            color: item.color,
+            style: item.styleTags.join('、'),
+            date: new Date().toISOString().split('T')[0]
+          })
+        });
+        return res.ok;
+      } catch (e) {
+        showToast('❌ 保存失败');
+        return false;
+      }
+    }
+
+    function finishBatchUpload() {
+      closeUploadModal();
+      uploadQueue = [];
+      currentEditIndex = 0;
+      isBatchMode = false;
+      switchTab('library');
+    }
+
+    function openUploadModal() {
+      document.getElementById('uploadModal').style.display = 'flex';
+    }
+
+    function closeUploadModal() {
+      document.getElementById('uploadModal').style.display = 'none';
+      if (uploadQueue.length > 0 && uploadQueue.some(q => !q.saved)) {
+        if (!confirm('还有未保存的穿搭，确定取消？')) return;
+      }
+      uploadQueue = [];
+      currentEditIndex = 0;
+      isBatchMode = false;
+      document.getElementById('stepSelect').style.display = 'block';
+      document.getElementById('stepEdit').style.display = 'none';
+      document.getElementById('modalTitle').textContent = '添加今日穿搭';
+      currentEditingId = null;
+      // 重置标签
+      document.querySelectorAll('.tag-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('seasonSelect').value = getCurrentSeason();
+    }
+
+    document.getElementById('uploadModal').addEventListener('click', function(e) {
+      if (e.target === this) closeUploadModal();
+    });
+
+    function getCurrentSeason() {
+      const m = new Date().getMonth() + 1;
+      if (m >= 3 && m <= 5) return '春';
+      if (m >= 6 && m <= 8) return '夏';
+      if (m >= 9 && m <= 11) return '秋';
+      return '冬';
+    }
+
+    // 编辑已有穿搭
+    function editOutfit(id) {
+      currentEditingId = id;
+      const outfit = allOutfits.find(o => o.id == id);
+      if (!outfit) return;
+      const tags = outfit.tags || [];
+      uploadQueue = [{
+        photo: outfit.photo, saved: false, color: outfit.color || '', season: outfit.season || getCurrentSeason(),
+        styleTags: [...tags], sceneTags: [], rgb: null
+      }];
+      isBatchMode = false;
+      currentEditIndex = 0;
+      enterEditMode();
+      document.getElementById('modalTitle').textContent = '编辑穿搭';
+    }
+
+    // 单图保存（兼容旧按钮，实际上走批量逻辑）
+    async function saveOutfit() {
+      if (uploadQueue.length === 0) { showToast('请先选择照片'); return; }
+      await saveCurrentAndNext();
+    }
+
+    async function loadOutfits() {
+      try {
+        const res = await fetch(`${API_BASE}/outfits`);
+        if (!res.ok) throw new Error('加载失败');
+        allOutfits = await res.json();
+        return allOutfits;
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function renderOutfits() {
+      const grid = document.getElementById('outfitGrid');
+      let filteredOutfits = allOutfits;
+
+      // 按搜索关键词筛选
+      if (searchKeyword) {
+        filteredOutfits = filteredOutfits.filter(o => {
+          const tags = (o.tags || []).map(t => t.toLowerCase());
+          const style = (o.style || '').toLowerCase();
+          const color = (o.color || '').toLowerCase();
+          return tags.some(t => t.includes(searchKeyword)) || style.includes(searchKeyword) || color.includes(searchKeyword);
+        });
+      }
+
+      // 按季节筛选
+      if (currentCategory !== 'all' && !currentCategory.includes('all')) {
+        filteredOutfits = filteredOutfits.filter(o => currentCategory.includes(o.season));
+      }
+
+      if (filteredOutfits.length === 0) {
+        grid.innerHTML = `
+          <div class="empty-state" style="grid-column: 1/-1;">
+            <div class="icon">👗</div>
+            <div>还没有穿搭<br>点击底部加号上传第一套吧</div>
+            <button class="refresh-btn" style="margin-top: 20px;" onclick="syncLocalOutfits()">恢复旧穿搭</button>
+          </div>
+        `;
+        return;
+      }
+
+      grid.innerHTML = filteredOutfits.map(outfit => `
+        <div class="outfit-card" onclick="editOutfit('${outfit.id}')">
+          <div class="photo-container">
+            <img src="${outfit.photo}" alt="穿搭" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23F9F2ED%22 width=%22100%22 height=%22100%22/><text x=%2250%22 y=%2250%22 text-anchor=%22middle%22 dy=%22.3em%22 font-size=%2240%22 fill=%22%23E8D8CE%22>👗</text></svg>'">
+            <button class="delete-btn" onclick="event.stopPropagation(); deleteOutfit('${outfit.id}')">×</button>
+          </div>
+          <div class="info">
+            <div class="tags">
+              ${(outfit.tags || []).slice(0, 3).map(t => `<span class="tag">${t}</span>`).join('')}
+              ${(outfit.tags || []).length > 3 ? `<span class="tag">+${outfit.tags.length -3}</span>` : ''}
+            </div>
+            <div class="meta">
+              <span class="date">${(outfit.date || '').split('T')[0] || ''}</span>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    async function deleteOutfit(id) {
+      if (!confirm('确定要删除这套穿搭吗？')) return;
+      
+      try {
+        const res = await fetch(`${API_BASE}/outfits/${id}`, { method: 'DELETE' });
+        if (!res.ok) throw new Error('删除失败');
+        showToast('✅ 已删除');
+        loadOutfits().then(renderOutfits);
+      } catch (e) {
+        showToast('❌ 删除失败');
+      }
+    }
+
+    async function loadRecommendations() {
+      const container = document.getElementById('recommendContainer');
+      // 先显示加载状态（简洁文字，无图标）
+      container.innerHTML = '<div class="empty-state" style="padding:40px 20px;"><div style="font-size:14px;color:var(--text-secondary);">加载中...</div></div>';
+      try {
+        const res = await fetch(`${API_BASE}/outfits`);
+        if (!res.ok) throw new Error('接口请求失败');
+        const allOutfits = await res.json();
+        const currentSeason = getCurrentSeason();
+        // 优先筛选当前季节的穿搭
+        let seasonOutfits = allOutfits.filter(o => o.season === currentSeason);
+        // 如果当前季节没有穿搭就用所有的
+        let candidates = seasonOutfits.length > 0 ? seasonOutfits : allOutfits;
+
+        if (candidates.length === 0) {
+          // 没有上传过穿搭的话，显示默认的推荐示例
+          container.innerHTML = `
+            <div class="recommend-card">
+              <div class="img-container">
+                <img src="https://picsum.photos/seed/outfit1/600/800.jpg" alt="推荐穿搭">
+              </div>
+              <div class="label">
+                <span class="tag">${currentSeason}季推荐</span>
+              </div>
+              <div class="info">
+                <div class="tags">
+                  <span class="tag">休闲</span>
+                  <span class="tag">通勤</span>
+                  <span class="tag">黑白</span>
+                </div>
+              </div>
+            </div>
+            <div class="empty-state" style="padding:20px 0;"><p>上传你自己的穿搭之后就会为你专属推荐啦😉</p></div>
+            <button class="refresh-btn" onclick="loadRecommendations()">换一套</button>
+          `;
+          return;
+        }
+
+        // 随机取一套
+        const outfit = candidates[Math.floor(Math.random() * candidates.length)];
+        container.innerHTML = `
+          <div class="recommend-card">
+            <div class="img-container">
+              <img src="${outfit.photo}" alt="推荐穿搭" onerror="this.src='https://picsum.photos/seed/outfit${Math.random()}/600/800.jpg'">
+            </div>
+            <div class="label">
+              <span class="tag">${currentSeason}季推荐</span>
+            </div>
+            <div class="info">
+              <div class="tags">
+                ${(outfit.tags || []).map(t => `<span class="tag">${t}</span>`).join('')}
+                ${outfit.color ? `<span class="tag">${outfit.color}</span>` : ''}
+                ${outfit.style ? `<span class="tag">${outfit.style}</span>` : ''}
+              </div>
+            </div>
+          </div>
+          <button class="refresh-btn" onclick="loadRecommendations()">换一套</button>
+        `;
+      } catch (e) {
+        // 接口失败的时候也显示默认推荐
+        const currentSeason = getCurrentSeason();
+        container.innerHTML = `
+          <div class="recommend-card">
+            <div class="img-container">
+              <img src="https://picsum.photos/seed/outfit2/600/800.jpg" alt="推荐穿搭">
+            </div>
+            <div class="label">
+              <span class="tag">${currentSeason}季推荐</span>
+            </div>
+            <div class="info">
+              <div class="tags">
+                <span class="tag">温柔</span>
+                <span class="tag">约会</span>
+                <span class="tag">粉色系</span>
+              </div>
+            </div>
+          </div>
+          <button class="refresh-btn" onclick="loadRecommendations()">换一套</button>
+        `;
+      }
+    }
+
+    // 同步本地旧穿搭数据到数据库
+    async function syncLocalOutfits() {
+      try {
+        // 尝试所有可能的旧存储key，兼容不同版本的缓存
+        let outfits = null;
+        const possibleKeys = ['outfits', 'outfitList', 'allOutfits', 'myOutfits', 'clothes'];
+        
+        for (const key of possibleKeys) {
+          const data = localStorage.getItem(key);
+          if (data) {
+            try {
+              const parsed = JSON.parse(data);
+              if (Array.isArray(parsed) && parsed.length > 0) {
+                outfits = parsed;
+                break;
+              }
+            } catch (e) {}
+          }
+        }
+
+        if (!outfits || outfits.length === 0) {
+          showToast('⚠️ 本地没有找到可恢复的旧穿搭数据');
+          return;
+        }
+
+        if (confirm(`检测到本地有${outfits.length}套旧穿搭，是否恢复到数据库？`)) {
+          let count = 0;
+          for (const outfit of outfits) {
+            try {
+              // 兼容不同版本的图片字段名
+              const photo = outfit.photo || outfit.src || outfit.url || '';
+              if (!photo) continue;
+              
+              // 上传到新数据库
+              await fetch(`${API_BASE}/outfits`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  photo: photo,
+                  tags: outfit.tags || [],
+                  season: outfit.season || getCurrentSeason(),
+                  color: outfit.color || '',
+                  style: outfit.style || '',
+                  date: outfit.date || new Date().toISOString().split('T')[0]
+                })
+              });
+              count++;
+            } catch (e) {
+              console.error('恢复单条穿搭失败:', e);
+            }
+          }
+          if (count > 0) {
+            showToast(`✅ 已成功恢复${count}套旧穿搭`);
+            // 重新加载数据刷新页面
+            await loadOutfits();
+            renderOutfits();
+            // 询问是否清除本地缓存避免重复恢复
+            if (confirm('恢复成功，是否清除本地缓存避免后续重复提示？')) {
+              possibleKeys.forEach(key => localStorage.removeItem(key));
+            }
+          } else {
+            showToast('❌ 恢复失败，请检查网络连接');
+          }
+        }
+      } catch (e) {
+        console.error('同步旧数据失败:', e);
+        showToast('❌ 恢复失败: ' + e.message);
+      }
+    }
+
+    // 页面加载初始化
+    window.onload = async function() {
+      // 默认选中当前季节
+      document.getElementById('seasonSelect').value = getCurrentSeason();
+      // 默认进入今日推荐页面
+      switchTab('recommend');
+      // 提前加载穿搭数据
+      await loadOutfits();
+      // 尝试同步本地旧数据
+      await syncLocalOutfits();
+      // 加载推荐内容
+      await loadRecommendations();
+    }
+  </script>
+</body>
+</html>
