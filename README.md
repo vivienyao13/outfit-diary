@@ -14,13 +14,9 @@
 
 ## 界面
 
-| 每日推荐 | 我的衣橱 |
-|---|---|
-| ![每日推荐](docs/screenshots/1-home.png) | ![我的衣橱](docs/screenshots/2-closet.png) |
-
-| 季节筛选 | 添加穿搭 |
-|---|---|
-| ![季节筛选](docs/screenshots/3-filter.png) | ![添加穿搭](docs/screenshots/4-add.png) |
+| 每日推荐 | 我的衣橱 | 添加穿搭 |
+|---|---|---|
+| ![每日推荐](docs/screenshots/1-recommend.jpg) | ![我的衣橱](docs/screenshots/2-closet.jpg) | ![添加穿搭](docs/screenshots/3-add.jpg) |
 
 ## 运行
 
